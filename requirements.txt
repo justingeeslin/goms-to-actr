@@ -1,0 +1,5 @@
+# Heroku installs the local library and these pinned web dependencies.
+.
+Django==5.2.18
+gunicorn==25.3.0
+whitenoise==6.12.0

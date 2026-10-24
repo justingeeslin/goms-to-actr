@@ -1,0 +1,68 @@
+# Executable NGOMSL subset; see docs/ngomsl.md.
+# Finite task-level adaptation; Think does not perform ACT-R retrieval.
+Model: tutorial-addition.
+Initial goal: add five and two.
+Initial state:
+  arg1 = 5.
+  arg2 = 2.
+  sum = "not-started".
+  count = 0.
+  status = "ready".
+
+Selection rule set for goal: add five and two
+  If arg1 is 5 and arg2 is 2, then accomplish goal: count up twice.
+  Return with goal accomplished.
+
+Method for goal: count up twice
+  Step 1. Set sum to 5 and count to 0 and status to "adding".
+  Step 2. Accomplish goal: increment five to six.
+  Step 3. Accomplish goal: increment zero to one.
+  Step 4. Accomplish goal: increment six to seven.
+  Step 5. Accomplish goal: increment one to two.
+  Step 6. Accomplish goal: report seven.
+  Step 7. Return with goal accomplished.
+
+Selection rule set for goal: increment five to six
+  If sum is 5 and count is 0, then accomplish goal: advance running sum for increment five to six.
+  Return with goal accomplished.
+
+Method for goal: advance running sum for increment five to six
+  Step 1. Think.
+  Step 2. Set sum to 6.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: increment zero to one
+  If sum is 6 and count is 0, then accomplish goal: record first increment.
+  Return with goal accomplished.
+
+Method for goal: record first increment
+  Step 1. Think.
+  Step 2. Set count to 1.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: increment six to seven
+  If sum is 6 and count is 1, then accomplish goal: advance running sum for increment six to seven.
+  Return with goal accomplished.
+
+Method for goal: advance running sum for increment six to seven
+  Step 1. Think.
+  Step 2. Set sum to 7.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: increment one to two
+  If sum is 7 and count is 1, then accomplish goal: record second increment.
+  Return with goal accomplished.
+
+Method for goal: record second increment
+  Step 1. Think.
+  Step 2. Set count to 2.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: report seven
+  If sum is 7 and count is 2 and arg2 is 2, then accomplish goal: finish after two increments.
+  Return with goal accomplished.
+
+Method for goal: finish after two increments
+  Step 1. Emit "7".
+  Step 2. Set status to "complete".
+  Step 3. Return with goal accomplished.

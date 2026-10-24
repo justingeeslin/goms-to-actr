@@ -5,12 +5,18 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "goms-to-actr"
 version = "0.1.0"
-description = "Compile structured hierarchical GOMS models into ACT-R 7 Lisp"
+description = "Compile structured GOMS and NGOMSL models into ACT-R 7 Lisp"
 requires-python = ">=3.10"
 license = {text = "MIT"}
+
+[project.optional-dependencies]
+web = ["Django>=5.2.18,<5.3", "gunicorn>=25.3,<26", "whitenoise>=6.12,<7"]
 
 [project.scripts]
 goms-to-actr = "goms_to_actr.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["goms_to_actr*"]
+
+[tool.setuptools.package-data]
+"goms_to_actr.web" = ["templates/converter/*.html", "static/converter/*.css", "static/converter/*.js"]

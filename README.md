@@ -1,8 +1,8 @@
 # GOMS → ACT-R
 
-An MIT-licensed Python compiler from a structured GOMS format to ACT-R 7 Common Lisp. Python 3.10+; no runtime dependencies. Includes a command-line interface, a library, input validation, an untimed source preview, and runnable examples.
+An MIT-licensed Python compiler from structured GOMS JSON or human-readable NGOMSL to ACT-R 7 Common Lisp. Python 3.10+; the compiler has no runtime dependencies. Includes a command-line interface, a library, input validation, an untimed source preview, runnable examples, and an optional Django web server.
 
-This is a new implementation. It does not reproduce G2A or parse arbitrary prose, GOMSL, NGOMSL, or CPM-GOMS files. Version 1 uses the JSON dialect below so translation decisions can be explicit and testable.
+This is an independent implementation with two input formats: the version-1 JSON dialect below and a [documented executable NGOMSL subset](docs/ngomsl.md). Both feed the same validated model and ACT-R compiler. It does not reproduce G2A or parse arbitrary prose, full NGOMSL, GOMSL/GLEAN, or CPM-GOMS files.
 
 ## Try it
 
@@ -12,21 +12,56 @@ From this directory, without installing anything:
 python3 -m goms_to_actr validate examples/write-message.json
 python3 -m goms_to_actr simulate examples/write-message.json
 python3 -m goms_to_actr compile examples/write-message.json -o examples/write-message.lisp
+python3 -m goms_to_actr validate examples/write-message.ngomsl
+python3 -m goms_to_actr simulate examples/write-message.ngomsl
+python3 -m goms_to_actr compile examples/write-message.ngomsl -o examples/write-message.ngomsl.lisp
 python3 -m unittest discover -s tests -v
 ```
 
 Optionally install with `python3 -m pip install -e .` to use the `goms-to-actr` command with the same arguments. Compile writes Lisp to stdout unless `-o` is supplied. Invalid input returns exit code 2; an untimed preview with no applicable method returns 1. Compilation never evaluates source text as Python or Lisp.
 
+`.ngomsl` files are recognized automatically; other extensions default to JSON. Use `--format ngomsl` or `--format json` to choose explicitly. Every stored example includes JSON, NGOMSL, and generated Lisp for both inputs.
+
+## Web server and API
+
+Run the Django demo locally (Python 3.13 is used on Heroku):
+
+```sh
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+DJANGO_DEBUG=1 python manage.py runserver
+```
+
+Open [localhost:8000](http://localhost:8000/) to edit GOMS JSON or NGOMSL, convert through the API, and copy or download the generated Lisp. The page calls `POST /api/convert/` with a JSON body containing `format` (`json` or `ngomsl`) and `source` (a string), and displays the response's `lisp` field. Invalid input returns a JSON `error` and a non-2xx status. The server does not store source or require a database.
+
+The [web server guide](docs/web.md) documents the API, tests, environment settings, and Heroku deployment. The repository includes a Gunicorn `Procfile`, pinned web requirements, a `.python-version`, and WhiteNoise static-file handling. For library installations, `pip install '.[web]'` adds the optional server dependencies.
+
 ## Tutorial examples
 
-The [tutorial examples guide](examples/tutorials/README.md) includes GOMS versions of ACT-R Unit 1 counting (2 through 4), addition (5 + 2), and three semantic judgments (canary as bird, animal, or fish). Each includes JSON input and generated Lisp, expected results, upstream source links, and an explanation of the adaptations. These are finite task-level descriptions; retrieval and loops are represented by explicit steps.
+The [tutorial examples guide](examples/tutorials/README.md) includes GOMS versions of ACT-R Unit 1 counting (2 through 4), addition (5 + 2), and three semantic judgments (canary as bird, animal, or fish). Each includes JSON and NGOMSL input, generated Lisp, expected results, upstream source links, and an explanation of the adaptations. These are finite task-level descriptions; retrieval and loops are represented by explicit steps.
 
 ```sh
 python3 -m goms_to_actr simulate examples/tutorials/semantic-chain.json
-python3 -m goms_to_actr compile examples/tutorials/addition.json -o addition.lisp
+python3 -m goms_to_actr compile examples/tutorials/addition.ngomsl -o addition.lisp
 ```
 
-## Input format
+## NGOMSL input
+
+NGOMSL spells out methods as numbered steps and selects specific goals through selection rules. For example:
+
+```text
+Model: greeting.
+Initial goal: greet.
+
+Method for goal: greet
+  Step 1. Speak "Hello".
+  Step 2. Return with goal accomplished.
+```
+
+The [NGOMSL guide](docs/ngomsl.md) covers initial state, conditions, selection rules, subgoals, supported operators, and parsing from Python. Start with [write-message.ngomsl](examples/write-message.ngomsl) for a complete example with keyboard and speech methods.
+
+## JSON input
 
 ```json
 {
@@ -103,11 +138,17 @@ The generated syntax follows the official ACT-R 7.30+ reference manual. The repo
 ## Python API
 
 ```python
-from goms_to_actr import load, compile_model, simulate
+from goms_to_actr import load, loads, parse_ngomsl, compile_model, simulate
 
 model = load("examples/write-message.json")
 lisp = compile_model(model, max_states=10000)
 preview = simulate(model, max_steps=10000)
+
+# NGOMSL uses the same compiler and preview:
+model = load("examples/write-message.ngomsl")
+lisp = compile_model(model)
+# Or: model = parse_ngomsl(source_text)
+# In-memory input in either format: model = loads(source_text, format="json")
 ```
 
 `validate(model)` accepts an in-memory dictionary. Invalid models raise `ModelError`. File operations may also raise normal I/O errors.

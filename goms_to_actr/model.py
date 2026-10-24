@@ -128,7 +128,26 @@ def validate(model):
     return model
 
 
-def load(path):
+def load(path, *, format=None):
+    """Load JSON or NGOMSL, detected by extension unless format is supplied."""
+    path = Path(path)
+    if format is None:
+        format = 'ngomsl' if path.suffix.lower() == '.ngomsl' else 'json'
+    if format == 'ngomsl':
+        from .ngomsl import load_ngomsl
+        return load_ngomsl(path)
+    if format != 'json':
+        raise ModelError(f'unsupported input format {format!r}; expected json or ngomsl')
+    return loads(path.read_text(encoding='utf-8'), format=format)
+
+
+def loads(source, *, format='json'):
+    """Parse source text without file I/O, preserving strict JSON validation."""
+    if format == 'ngomsl':
+        from .ngomsl import parse_ngomsl
+        return parse_ngomsl(source)
+    if format != 'json':
+        raise ModelError(f'unsupported input format {format!r}; expected json or ngomsl')
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -137,6 +156,8 @@ def load(path):
             result[key] = value
         return result
     try:
-        return validate(json.loads(Path(path).read_text(encoding='utf-8'), object_pairs_hook=unique))
-    except (json.JSONDecodeError, RecursionError) as exc:
+        return validate(json.loads(source, object_pairs_hook=unique))
+    except ModelError:
+        raise
+    except (ValueError, RecursionError) as exc:
         raise ModelError(f'invalid JSON: {exc}') from exc

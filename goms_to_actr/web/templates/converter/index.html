@@ -1,0 +1,65 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Convert GOMS JSON or NGOMSL to ACT-R 7 Common Lisp. Edit a model and try the conversion API in your browser.">
+  <title>GOMS to ACT-R · Model converter</title>
+  <link rel="stylesheet" href="{% static 'converter/style.css' %}">
+  <script src="{% static 'converter/app.js' %}" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="{% url 'index' %}" aria-label="GOMS to ACT-R home"><span class="logo" aria-hidden="true">g→a</span> GOMS to ACT-R</a>
+    <a class="nav-link" href="#api">Use the API <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span> FROM TASK DESCRIPTION TO COGNITIVE MODEL</p>
+      <h1 id="page-title">GOMS to ACT-R · Model converter</h1>
+      <p class="lede">Turn GOMS JSON or NGOMSL into ACT-R 7 Common Lisp.<br class="desktop-break"> </p>
+      <div class="flow" aria-label="GOMS or NGOMSL source converts to ACT-R 7 Lisp"><span>GOMS / NGOMSL</span><span aria-hidden="true">→</span><span>ACT-R 7</span></div>
+    </section>
+
+    <form id="converter" action="{% url 'convert' %}" method="post">
+      <div class="workspace-toolbar">
+        <div><h2>Model workspace</h2><p>Edit the source. Inspect the generated productions.</p></div>
+        <button type="submit" class="button primary" id="convert-button">Convert to ACT-R <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="workspace">
+        <section class="pane source-pane" aria-labelledby="source-heading">
+          <div class="pane-header"><h3 id="source-heading"><span class="step">01</span> Source model</h3><button type="button" class="text-button" id="load-example">Load example</button></div>
+          <div class="editor-toolbar">
+            <label for="source-format">Format</label>
+            <select id="source-format" name="format"><option value="ngomsl">NGOMSL</option><option value="json">GOMS JSON</option></select>
+            <span class="file-label" id="source-extension">.ngomsl</span>
+          </div>
+          <label class="sr-only" for="source">Model source</label>
+          <textarea id="source" name="source" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="source-hint" required>{{ examples.ngomsl }}</textarea>
+          <div class="pane-footer" id="source-hint">Plain text in, validated model out.<span class="shortcut">⌘ / Ctrl + Enter to convert</span></div>
+        </section>
+        <section class="pane result-pane" aria-labelledby="result-heading">
+          <div class="pane-header"><h3 id="result-heading"><span class="step">02</span> ACT-R output</h3><span class="output-kind">COMMON LISP</span></div>
+          <div class="editor-toolbar result-toolbar"><span id="output-filename">output.lisp</span><div class="output-actions"><button type="button" class="text-button" id="copy-button" disabled>Copy</button><button type="button" class="text-button" id="download-button" disabled>Download ↓</button></div></div>
+          <div class="output-body" id="output-body" tabindex="0" aria-label="Generated ACT-R Lisp">
+            <div class="empty-state" id="empty-state"><span class="empty-symbol" aria-hidden="true">( → )</span><p>A model begins here.</p><span>Convert your source to see the<br>generated ACT-R productions.</span></div>
+            <pre id="output" hidden></pre>
+          </div>
+          <div class="pane-footer result-footer"><span id="output-details">Ready when you are.</span><span>ACT-R 7</span></div>
+        </section>
+      </div>
+      <div class="status-row"><p id="status" role="status" aria-live="polite">Example loaded. Ready to convert.</p><span>No source is stored.</span></div>
+      <p id="error" class="error" role="alert" hidden></p>
+      <noscript><p class="error">Enable JavaScript to use this demo, or call the JSON API below.</p></noscript>
+    </form>
+
+      <div class="api-example"><div class="endpoint"><span>POST</span><code>{% url 'convert' %}</code></div><pre><code>curl <span id="api-url">http://localhost:8000{% url 'convert' %}</span> \
+  -H 'Content-Type: application/json' \
+  -d '{"format":"ngomsl","source":"Model: hello.\nInitial goal: greet.\nMethod for goal: greet\nStep 1. Speak \"Hello\".\nStep 2. Return with goal accomplished."}'</code></pre></div>
+    </section>
+  </main>
+  <footer class="site-footer"><span>GOMS to ACT-R </footer>
+  {{ examples|json_script:"examples-data" }}
+</body>
+</html>

@@ -1,0 +1,49 @@
+# Executable NGOMSL subset; see docs/ngomsl.md.
+# Finite task-level adaptation; Think does not perform ACT-R retrieval.
+Model: tutorial-count.
+Initial goal: count from two to four.
+Initial state:
+  start = 2.
+  end = 4.
+  count = "not-started".
+  status = "ready".
+
+Selection rule set for goal: count from two to four
+  If start is 2 and end is 4, then accomplish goal: count the fixed interval.
+  Return with goal accomplished.
+
+Method for goal: count the fixed interval
+  Step 1. Set count to 2 and status to "counting".
+  Step 2. Emit "2".
+  Step 3. Accomplish goal: advance two to three.
+  Step 4. Emit "3".
+  Step 5. Accomplish goal: advance three to four.
+  Step 6. Accomplish goal: finish at four.
+  Step 7. Return with goal accomplished.
+
+Selection rule set for goal: advance two to three
+  If count is 2, then accomplish goal: use successor of two.
+  Return with goal accomplished.
+
+Method for goal: use successor of two
+  Step 1. Think.
+  Step 2. Set count to 3.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: advance three to four
+  If count is 3, then accomplish goal: use successor of three.
+  Return with goal accomplished.
+
+Method for goal: use successor of three
+  Step 1. Think.
+  Step 2. Set count to 4.
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: finish at four
+  If count is 4 and end is 4, then accomplish goal: report endpoint.
+  Return with goal accomplished.
+
+Method for goal: report endpoint
+  Step 1. Emit "4".
+  Step 2. Set status to "complete".
+  Step 3. Return with goal accomplished.

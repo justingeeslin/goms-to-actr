@@ -1,16 +1,16 @@
 # ACT-R tutorial tasks expressed as GOMS
 
-These five runnable examples are original task-level GOMS descriptions of three ACT-R Unit 1 tutorial models. They use this project's version 1 JSON format and compile without extensions. Each JSON file has an accompanying generated `.lisp` file.
+These five runnable examples are original task-level GOMS descriptions of three ACT-R Unit 1 tutorial models. Each has version-1 JSON and [executable NGOMSL](../../docs/ngomsl.md) sources. Generated `.lisp` files come from JSON; `.ngomsl.lisp` files come from NGOMSL. Both inputs use the same ACT-R compiler.
 
 The task definitions were checked against the tutorial Lisp files in the [asmaloney mirror of the official ACT-R implementation](https://github.com/asmaloney/ACT-R). This mirror is a historical snapshot, not a claim about the newest tutorial release. No upstream Lisp implementation is bundled here.
 
-| GOMS source | Tutorial task | Expected result |
-| --- | --- | --- |
-| [count.json](count.json) | Count from 2 through 4 | Emits `2`, `3`, `4`; final `count` is 4 |
-| [addition.json](addition.json) | Add 5 and 2 by counting up | Emits `7`; final `sum` is 7 and `count` is 2 |
-| [semantic-direct.json](semantic-direct.json) | Is a canary a bird? | `judgment` becomes `yes` after one category link |
-| [semantic-chain.json](semantic-chain.json) | Is a canary an animal? | `judgment` becomes `yes` after two category links |
-| [semantic-failure.json](semantic-failure.json) | Is a canary a fish? | `judgment` becomes `no` after exhausting the category chain |
+| JSON source | NGOMSL source | Tutorial task | Expected result |
+| --- | --- | --- | --- |
+| [count.json](count.json) | [count.ngomsl](count.ngomsl) | Count from 2 through 4 | Emits `2`, `3`, `4`; final `count` is 4 |
+| [addition.json](addition.json) | [addition.ngomsl](addition.ngomsl) | Add 5 and 2 by counting up | Emits `7`; final `sum` is 7 and `count` is 2 |
+| [semantic-direct.json](semantic-direct.json) | [semantic-direct.ngomsl](semantic-direct.ngomsl) | Is a canary a bird? | `judgment` becomes `yes` after one category link |
+| [semantic-chain.json](semantic-chain.json) | [semantic-chain.ngomsl](semantic-chain.ngomsl) | Is a canary an animal? | `judgment` becomes `yes` after two category links |
+| [semantic-failure.json](semantic-failure.json) | [semantic-failure.ngomsl](semantic-failure.ngomsl) | Is a canary a fish? | `judgment` becomes `no` after exhausting the category chain |
 
 All five end with source state `status: "complete"` and generated goal `pc done`. A negative category judgment is a successful task completion, so the semantic-failure example ends at `done`, not `failed`. `pc failed` means that no GOMS method was applicable.
 
@@ -24,16 +24,23 @@ python3 -m goms_to_actr simulate examples/tutorials/count.json
 python3 -m goms_to_actr simulate examples/tutorials/addition.json
 python3 -m goms_to_actr simulate examples/tutorials/semantic-chain.json
 python3 -m goms_to_actr compile examples/tutorials/count.json -o examples/tutorials/count.lisp
+python3 -m goms_to_actr simulate examples/tutorials/count.ngomsl
+python3 -m goms_to_actr compile examples/tutorials/count.ngomsl -o examples/tutorials/count.ngomsl.lisp
 python3 -m unittest discover -s tests -v
 ```
 
 Use the same commands with any of the other filenames. The preview's `events` list shows the selected methods and intermediate state assignments, including the separate running-sum and increment-counter updates in addition.
 
-To regenerate all five Lisp files:
+NGOMSL makes selection rules explicit: a general goal dispatches to a specific method goal. The operator events and final state match the JSON versions; these explicit subgoals can add goal-entry events and sequencing productions. Rules use the compiler's first-match policy. The arithmetic and retrieval adaptations below apply to both formats.
+
+To regenerate both sets of tutorial Lisp files:
 
 ```sh
 for model in examples/tutorials/*.json; do
   python3 -m goms_to_actr compile "$model" -o "${model%.json}.lisp"
+done
+for model in examples/tutorials/*.ngomsl; do
+  python3 -m goms_to_actr compile "$model" -o "$model.lisp"
 done
 ```
 
