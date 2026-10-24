@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "goms-to-actr"
+version = "0.1.0"
+description = "Compile structured hierarchical GOMS models into ACT-R 7 Lisp"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[project.scripts]
+goms-to-actr = "goms_to_actr.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["goms_to_actr*"]

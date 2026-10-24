@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "name": "tutorial-count",
+  "entry": "count-from-two-to-four",
+  "state": {
+    "start": 2,
+    "end": 4,
+    "count": "not-started",
+    "status": "ready"
+  },
+  "goals": {
+    "count-from-two-to-four": [
+      {
+        "name": "count-the-fixed-interval",
+        "when": {
+          "start": 2,
+          "end": 4
+        },
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "count": 2,
+              "status": "counting"
+            }
+          },
+          {
+            "op": "emit",
+            "text": "2"
+          },
+          {
+            "goal": "advance-two-to-three"
+          },
+          {
+            "op": "emit",
+            "text": "3"
+          },
+          {
+            "goal": "advance-three-to-four"
+          },
+          {
+            "goal": "finish-at-four"
+          }
+        ]
+      }
+    ],
+    "advance-two-to-three": [
+      {
+        "name": "use-successor-of-two",
+        "when": {
+          "count": 2
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "count": 3
+            }
+          }
+        ]
+      }
+    ],
+    "advance-three-to-four": [
+      {
+        "name": "use-successor-of-three",
+        "when": {
+          "count": 3
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "count": 4
+            }
+          }
+        ]
+      }
+    ],
+    "finish-at-four": [
+      {
+        "name": "report-endpoint",
+        "when": {
+          "count": 4,
+          "end": 4
+        },
+        "steps": [
+          {
+            "op": "emit",
+            "text": "4"
+          },
+          {
+            "op": "set",
+            "values": {
+              "status": "complete"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

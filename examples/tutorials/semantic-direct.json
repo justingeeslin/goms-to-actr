@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "name": "tutorial-semantic-direct",
+  "entry": "judge-canary-membership",
+  "state": {
+    "object": "canary",
+    "category": "bird",
+    "candidate": "not-started",
+    "judgment": "not-started",
+    "status": "ready"
+  },
+  "goals": {
+    "judge-canary-membership": [
+      {
+        "name": "follow-canary-category-links",
+        "when": {
+          "object": "canary"
+        },
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "judgment": "pending",
+              "status": "searching"
+            }
+          },
+          {
+            "goal": "find-canary-category"
+          },
+          {
+            "goal": "check-bird"
+          }
+        ]
+      }
+    ],
+    "find-canary-category": [
+      {
+        "name": "use-canary-is-a-bird",
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "candidate": "bird"
+            }
+          }
+        ]
+      }
+    ],
+    "check-bird": [
+      {
+        "name": "verify-direct-link",
+        "when": {
+          "candidate": "bird",
+          "category": "bird"
+        },
+        "steps": [
+          {
+            "goal": "answer-yes"
+          }
+        ]
+      },
+      {
+        "name": "follow-bird-parent",
+        "when": {
+          "candidate": "bird"
+        },
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "object": "bird"
+            }
+          },
+          {
+            "goal": "find-bird-category"
+          },
+          {
+            "goal": "check-animal"
+          }
+        ]
+      }
+    ],
+    "find-bird-category": [
+      {
+        "name": "use-bird-is-an-animal",
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "candidate": "animal"
+            }
+          }
+        ]
+      }
+    ],
+    "check-animal": [
+      {
+        "name": "verify-chained-link",
+        "when": {
+          "candidate": "animal",
+          "category": "animal"
+        },
+        "steps": [
+          {
+            "goal": "answer-yes"
+          }
+        ]
+      },
+      {
+        "name": "exhaust-category-chain",
+        "when": {
+          "candidate": "animal"
+        },
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "object": "animal"
+            }
+          },
+          {
+            "op": "think"
+          },
+          {
+            "goal": "answer-no"
+          }
+        ]
+      }
+    ],
+    "answer-yes": [
+      {
+        "name": "record-positive-judgment",
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "judgment": "yes",
+              "status": "complete"
+            }
+          }
+        ]
+      }
+    ],
+    "answer-no": [
+      {
+        "name": "record-negative-judgment",
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "judgment": "no",
+              "status": "complete"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

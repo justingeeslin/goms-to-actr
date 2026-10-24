@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "name": "tutorial-addition",
+  "entry": "add-five-and-two",
+  "state": {
+    "arg1": 5,
+    "arg2": 2,
+    "sum": "not-started",
+    "count": 0,
+    "status": "ready"
+  },
+  "goals": {
+    "add-five-and-two": [
+      {
+        "name": "count-up-twice",
+        "when": {
+          "arg1": 5,
+          "arg2": 2
+        },
+        "steps": [
+          {
+            "op": "set",
+            "values": {
+              "sum": 5,
+              "count": 0,
+              "status": "adding"
+            }
+          },
+          {
+            "goal": "increment-five-to-six"
+          },
+          {
+            "goal": "increment-zero-to-one"
+          },
+          {
+            "goal": "increment-six-to-seven"
+          },
+          {
+            "goal": "increment-one-to-two"
+          },
+          {
+            "goal": "report-seven"
+          }
+        ]
+      }
+    ],
+    "increment-five-to-six": [
+      {
+        "name": "advance-running-sum",
+        "when": {
+          "sum": 5,
+          "count": 0
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "sum": 6
+            }
+          }
+        ]
+      }
+    ],
+    "increment-zero-to-one": [
+      {
+        "name": "record-first-increment",
+        "when": {
+          "sum": 6,
+          "count": 0
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "count": 1
+            }
+          }
+        ]
+      }
+    ],
+    "increment-six-to-seven": [
+      {
+        "name": "advance-running-sum",
+        "when": {
+          "sum": 6,
+          "count": 1
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "sum": 7
+            }
+          }
+        ]
+      }
+    ],
+    "increment-one-to-two": [
+      {
+        "name": "record-second-increment",
+        "when": {
+          "sum": 7,
+          "count": 1
+        },
+        "steps": [
+          {
+            "op": "think"
+          },
+          {
+            "op": "set",
+            "values": {
+              "count": 2
+            }
+          }
+        ]
+      }
+    ],
+    "report-seven": [
+      {
+        "name": "finish-after-two-increments",
+        "when": {
+          "sum": 7,
+          "count": 2,
+          "arg2": 2
+        },
+        "steps": [
+          {
+            "op": "emit",
+            "text": "7"
+          },
+          {
+            "op": "set",
+            "values": {
+              "status": "complete"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

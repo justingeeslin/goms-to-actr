@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "name": "write-message",
+  "entry": "send-message",
+  "state": {"mode": "keyboard", "sent": "no"},
+  "goals": {
+    "send-message": [
+      {"name": "compose-and-send", "steps": [
+        {"goal": "compose"},
+        {"op": "press_key", "key": "return"},
+        {"op": "set", "values": {"sent": "yes"}},
+        {"op": "emit", "text": "Message sent"}
+      ]}
+    ],
+    "compose": [
+      {"name": "use-keyboard", "when": {"mode": "keyboard"}, "steps": [
+        {"op": "think"},
+        {"op": "type_text", "text": "hello world"}
+      ]},
+      {"name": "use-speech", "steps": [
+        {"op": "speak", "text": "hello world"}
+      ]}
+    ]
+  }
+}
