@@ -1,0 +1,28 @@
+# Executable NGOMSL subset; see docs/ngomsl.md.
+# Finite task-level adaptation; Think does not perform ACT-R retrieval.
+Model: write-message.
+Initial goal: send message.
+Initial state:
+  mode = "keyboard".
+  sent = "no".
+
+Method for goal: send message
+  Step 1. Accomplish goal: compose.
+  Step 2. Press key "return".
+  Step 3. Set sent to "yes".
+  Step 4. Emit "Message sent".
+  Step 5. Return with goal accomplished.
+
+Selection rule set for goal: compose
+  If mode is "keyboard", then accomplish goal: use keyboard.
+  Otherwise accomplish goal: use speech.
+  Return with goal accomplished.
+
+Method for goal: use keyboard
+  Step 1. Think.
+  Step 2. Type text "hello world".
+  Step 3. Return with goal accomplished.
+
+Method for goal: use speech
+  Step 1. Speak "hello world".
+  Step 2. Return with goal accomplished.

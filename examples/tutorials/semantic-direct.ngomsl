@@ -1,0 +1,68 @@
+# Executable NGOMSL subset; see docs/ngomsl.md.
+# Finite task-level adaptation; Think does not perform ACT-R retrieval.
+Model: tutorial-semantic-direct.
+Initial goal: judge canary membership.
+Initial state:
+  object = "canary".
+  category = "bird".
+  candidate = "not-started".
+  judgment = "not-started".
+  status = "ready".
+
+Selection rule set for goal: judge canary membership
+  If object is "canary", then accomplish goal: follow canary category links.
+  Return with goal accomplished.
+
+Method for goal: follow canary category links
+  Step 1. Set judgment to "pending" and status to "searching".
+  Step 2. Accomplish goal: find canary category.
+  Step 3. Accomplish goal: check bird.
+  Step 4. Return with goal accomplished.
+
+Method for goal: find canary category
+  Step 1. Think.
+  Step 2. Set candidate to "bird".
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: check bird
+  If candidate is "bird" and category is "bird", then accomplish goal: verify direct link.
+  If candidate is "bird", then accomplish goal: follow bird parent.
+  Return with goal accomplished.
+
+Method for goal: verify direct link
+  Step 1. Accomplish goal: answer yes.
+  Step 2. Return with goal accomplished.
+
+Method for goal: follow bird parent
+  Step 1. Set object to "bird".
+  Step 2. Accomplish goal: find bird category.
+  Step 3. Accomplish goal: check animal.
+  Step 4. Return with goal accomplished.
+
+Method for goal: find bird category
+  Step 1. Think.
+  Step 2. Set candidate to "animal".
+  Step 3. Return with goal accomplished.
+
+Selection rule set for goal: check animal
+  If candidate is "animal" and category is "animal", then accomplish goal: verify chained link.
+  If candidate is "animal", then accomplish goal: exhaust category chain.
+  Return with goal accomplished.
+
+Method for goal: verify chained link
+  Step 1. Accomplish goal: answer yes.
+  Step 2. Return with goal accomplished.
+
+Method for goal: exhaust category chain
+  Step 1. Set object to "animal".
+  Step 2. Think.
+  Step 3. Accomplish goal: answer no.
+  Step 4. Return with goal accomplished.
+
+Method for goal: answer yes
+  Step 1. Set judgment to "yes" and status to "complete".
+  Step 2. Return with goal accomplished.
+
+Method for goal: answer no
+  Step 1. Set judgment to "no" and status to "complete".
+  Step 2. Return with goal accomplished.

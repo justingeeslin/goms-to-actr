@@ -1,0 +1,12 @@
+{
+  "name": "GOMS to ACT-R",
+  "description": "Compile GOMS JSON and NGOMSL into ACT-R 7 Lisp, with a browser demo and JSON API.",
+  "env": {
+    "DJANGO_SECRET_KEY": {"generator": "secret"},
+    "DJANGO_DEBUG": {"value": "0"},
+    "DJANGO_ALLOWED_HOSTS": {
+      "description": "Comma-separated hostnames for this app (without https://), including its exact Heroku hostname."
+    }
+  },
+  "buildpacks": [{"url": "heroku/python"}]
+}

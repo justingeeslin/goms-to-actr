@@ -6,9 +6,11 @@ from . import ModelError, compile_model, load, simulate
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Convert structured GOMS JSON to ACT-R 7 Lisp')
+    parser = argparse.ArgumentParser(description='Convert GOMS JSON or NGOMSL to ACT-R 7 Lisp')
     parser.add_argument('command', choices=['compile', 'validate', 'simulate'])
     parser.add_argument('input', type=Path)
+    parser.add_argument('--format', choices=['json', 'ngomsl'],
+                        help='input format (default: NGOMSL for .ngomsl files, otherwise JSON)')
     parser.add_argument('-o', '--output', type=Path, help='output file (compile only; default stdout)')
     args = parser.parse_args(argv)
     if args.output and args.command != 'compile':
@@ -16,7 +18,7 @@ def main(argv=None):
     if args.output and args.output.resolve() == args.input.resolve():
         parser.error('output must differ from input')
     try:
-        model = load(args.input)
+        model = load(args.input, format=args.format)
         if args.command == 'compile':
             result = compile_model(model)
             if args.output:
