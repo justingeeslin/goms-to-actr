@@ -19,6 +19,15 @@ Open [http://localhost:8000/](http://localhost:8000/). The example is preloaded.
 
 `DJANGO_DEBUG=1` explicitly enables development settings and a development-only secret. Debugging is off by default, and production startup requires `DJANGO_SECRET_KEY`.
 
+To run the same Gunicorn command used on Heroku, activate the virtual environment above, then run:
+
+```sh
+cp .env.example .env
+heroku local web -p 8000
+```
+
+Open [http://localhost:8000/](http://localhost:8000/). Heroku Local reads `.env`; `manage.py runserver` does not. The example enables local debugging and must not be used as production configuration.
+
 ## Conversion endpoint
 
 `POST /api/convert/` requires `Content-Type: application/json` and exactly two body fields:
@@ -77,14 +86,15 @@ The repository includes:
 - `requirements.txt` for the Python buildpack.
 - `Procfile` running `goms_to_actr.web.wsgi:application` with Gunicorn on `$PORT`.
 - WhiteNoise middleware and compressed, fingerprinted static assets.
-- `app.json` with a generated production secret and required hostname configuration for dashboard-based setup.
+- `app.json` selecting the Heroku-24 stack, one Basic web dyno, two Gunicorn workers, a generated production secret, and required hostname configuration for template-based setup. Basic dynos are billed by Heroku; choose a different size if appropriate. See the [manifest schema](https://devcenter.heroku.com/articles/app-json-schema).
 
 Heroku runs `python manage.py collectstatic --noinput` during a normal Python build. Keep that step enabled. This follows Heroku's [Python version configuration](https://devcenter.heroku.com/articles/python-support) and [Django static-file guidance](https://devcenter.heroku.com/articles/django-assets).
 
 After committing the files you intend to deploy, create the Heroku app with the CLI:
 
 ```sh
-heroku create your-app-name --buildpack heroku/python
+heroku login
+heroku create your-app-name --stack heroku-24 --buildpack heroku/python
 heroku apps:info --app your-app-name
 ```
 
@@ -95,13 +105,18 @@ heroku config:set \
   DJANGO_DEBUG=0 \
   DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
   DJANGO_ALLOWED_HOSTS=your-exact-hostname.herokuapp.com \
+  WEB_CONCURRENCY=2 \
   --app your-app-name
 git push heroku HEAD:main
-heroku ps:scale web=1 --app your-app-name
+heroku ps:scale web=1:basic --app your-app-name
 heroku open --app your-app-name
 ```
 
 Set config variables before the first push so the build's `collectstatic` command can load production settings. Do not commit the secret. No Postgres add-on, `DATABASE_URL`, or migration/release command is needed. To add a custom domain, append it to the comma-separated `DJANGO_ALLOWED_HOSTS` list.
+
+For an existing Heroku app, use `heroku git:remote --app your-app-name` instead of `heroku create`, and confirm that it uses the Python buildpack and Heroku-24 stack. CLI creation and Git pushes do not apply `app.json`; the config and scaling commands above supply those settings explicitly.
+
+After deployment, check that the home page loads with its CSS and JavaScript, then convert the preloaded example. Use `heroku logs --tail --app your-app-name` to inspect startup or request failures.
 
 Production settings disable debug output, redirect HTTP to HTTPS, use secure cookies, and enable HSTS. On Heroku, the server trusts the router's `X-Forwarded-Proto` header when `DYNO` is present. For another host, configure its trusted TLS proxy before using production settings. These choices follow Django's [deployment checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/).
 
@@ -110,7 +125,7 @@ Production settings disable debug output, redirect HTTP to HTTPS, use secure coo
 | `DJANGO_DEBUG` | `0`; set to `1` only for local development |
 | `DJANGO_SECRET_KEY` | Required when debugging is off |
 | `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1,[::1]`; set the actual hostnames for deployment |
-| `WEB_CONCURRENCY` | Optional Gunicorn worker count; otherwise Gunicorn's default |
+| `WEB_CONCURRENCY` | Gunicorn worker count; the manifest and deployment commands set `2` |
 | `PORT` | Provided by Heroku for the web process |
 
 ## Verification
@@ -124,7 +139,7 @@ DJANGO_DEBUG=1 python manage.py check
 DJANGO_DEBUG=1 python manage.py collectstatic --noinput
 ```
 
-The HTTP tests verify both formats against the library, all repository examples, invalid input, duplicate keys, methods, content types, request and expansion limits, and the public API's cookie-free behavior. The original tests continue to run without Django installed.
+The HTTP tests verify both formats against the library, all repository examples, invalid input, duplicate keys, methods, content types, request and expansion limits, and the public API's cookie-free behavior. Deployment tests also collect static assets with production settings, request the fingerprinted CSS and JavaScript through WhiteNoise, verify HTTPS proxy handling and hostname validation, and convert both formats behind the simulated Heroku router. The original tests continue to run without Django installed.
 
 Before deploying, run Django's deployment checks with production configuration:
 

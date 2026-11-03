@@ -1,11 +1,19 @@
 {
   "name": "GOMS to ACT-R",
   "description": "Compile GOMS JSON and NGOMSL into ACT-R 7 Lisp, with a browser demo and JSON API.",
+  "stack": "heroku-24",
+  "formation": {
+    "web": {"quantity": 1, "size": "basic"}
+  },
   "env": {
     "DJANGO_SECRET_KEY": {"generator": "secret"},
     "DJANGO_DEBUG": {"value": "0"},
     "DJANGO_ALLOWED_HOSTS": {
       "description": "Comma-separated hostnames for this app (without https://), including its exact Heroku hostname."
+    },
+    "WEB_CONCURRENCY": {
+      "description": "Number of Gunicorn worker processes per web dyno.",
+      "value": "2"
     }
   },
   "buildpacks": [{"url": "heroku/python"}]

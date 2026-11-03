@@ -37,6 +37,8 @@ Open [localhost:8000](http://localhost:8000/) to edit GOMS JSON or NGOMSL, conve
 
 The [web server guide](docs/web.md) documents the API, tests, environment settings, and Heroku deployment. The repository includes a Gunicorn `Procfile`, pinned web requirements, a `.python-version`, and WhiteNoise static-file handling. For library installations, `pip install '.[web]'` adds the optional server dependencies.
 
+To host the demo, follow the [Heroku deployment instructions](docs/web.md#heroku-deployment). The app runs on a single web dyno without a database. To try its `Procfile` locally, activate the virtual environment, copy `.env.example` to `.env`, and run `heroku local web -p 8000`.
+
 ## Tutorial examples
 
 The [tutorial examples guide](examples/tutorials/README.md) includes GOMS versions of ACT-R Unit 1 counting (2 through 4), addition (5 + 2), and three semantic judgments (canary as bird, animal, or fish). Each includes JSON and NGOMSL input, generated Lisp, expected results, upstream source links, and an explanation of the adaptations. These are finite task-level descriptions; retrieval and loops are represented by explicit steps.
